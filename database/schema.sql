@@ -1,0 +1,236 @@
+-- ============================================================
+-- AGRITRADE DATABASE SCHEMA
+-- Version: 1.0 MVP
+-- Database: agritrade
+-- ============================================================
+
+
+-- ============================================================
+-- 1. CROPS
+-- Stores the commodities/crops supported by AgriTrade
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS crops (
+    crop_id SERIAL PRIMARY KEY,
+    crop_name VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 2. MARKETS
+-- Stores mandi/market information
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS markets (
+    market_id SERIAL PRIMARY KEY,
+
+    market_name VARCHAR(150) NOT NULL,
+    district VARCHAR(100),
+    state VARCHAR(100) NOT NULL,
+
+    latitude DECIMAL(10, 7),
+    longitude DECIMAL(10, 7),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT unique_market
+        UNIQUE (market_name, district, state)
+);
+
+
+-- ============================================================
+-- 3. MARKET PRICES
+-- Stores historical/current mandi price observations
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS market_prices (
+    price_id BIGSERIAL PRIMARY KEY,
+
+    market_id INTEGER NOT NULL
+        REFERENCES markets(market_id),
+
+    crop_id INTEGER NOT NULL
+        REFERENCES crops(crop_id),
+
+    variety VARCHAR(150),
+    grade VARCHAR(100),
+
+    arrival_date DATE NOT NULL,
+
+    min_price DECIMAL(12, 2),
+    max_price DECIMAL(12, 2),
+    modal_price DECIMAL(12, 2),
+
+    price_unit VARCHAR(50),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 4. WEATHER RECORDS
+-- Weather information associated with a market/location
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS weather_records (
+    weather_id BIGSERIAL PRIMARY KEY,
+
+    market_id INTEGER
+        REFERENCES markets(market_id),
+
+    observation_date DATE NOT NULL,
+
+    temperature_mean DECIMAL(6, 2),
+    temperature_min DECIMAL(6, 2),
+    temperature_max DECIMAL(6, 2),
+
+    rainfall DECIMAL(10, 2),
+    humidity DECIMAL(6, 2),
+    wind_speed DECIMAL(8, 2),
+
+    source VARCHAR(100),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 5. TRANSPORT COSTS
+-- Stores estimated transportation costs between markets
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS transport_costs (
+    transport_id BIGSERIAL PRIMARY KEY,
+
+    origin_market_id INTEGER NOT NULL
+        REFERENCES markets(market_id),
+
+    destination_market_id INTEGER NOT NULL
+        REFERENCES markets(market_id),
+
+    distance_km DECIMAL(10, 2),
+    cost_per_km DECIMAL(10, 2),
+    fixed_cost DECIMAL(12, 2),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT different_markets
+        CHECK (origin_market_id <> destination_market_id)
+);
+
+
+-- ============================================================
+-- 6. STORAGE COSTS
+-- Stores estimated crop storage costs
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS storage_costs (
+    storage_cost_id SERIAL PRIMARY KEY,
+
+    market_id INTEGER
+        REFERENCES markets(market_id),
+
+    cost_per_kg_per_day DECIMAL(10, 4) NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 7. FARMER REQUESTS
+-- Stores inputs submitted by the farmer/user
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS farmer_requests (
+    request_id BIGSERIAL PRIMARY KEY,
+
+    crop_id INTEGER NOT NULL
+        REFERENCES crops(crop_id),
+
+    location_name VARCHAR(150) NOT NULL,
+
+    latitude DECIMAL(10, 7),
+    longitude DECIMAL(10, 7),
+
+    quantity_kg DECIMAL(12, 2) NOT NULL,
+
+    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 8. PRICE PREDICTIONS
+-- Stores ML-generated future price predictions
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS price_predictions (
+    prediction_id BIGSERIAL PRIMARY KEY,
+
+    crop_id INTEGER NOT NULL
+        REFERENCES crops(crop_id),
+
+    market_id INTEGER NOT NULL
+        REFERENCES markets(market_id),
+
+    forecast_date DATE NOT NULL,
+
+    predicted_price DECIMAL(12, 2) NOT NULL,
+
+    model_name VARCHAR(100),
+    model_version VARCHAR(50),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- 9. RECOMMENDATIONS
+-- Stores the final selling recommendation generated by AgriTrade
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS recommendations (
+    recommendation_id BIGSERIAL PRIMARY KEY,
+
+    request_id BIGINT NOT NULL
+        REFERENCES farmer_requests(request_id),
+
+    market_id INTEGER NOT NULL
+        REFERENCES markets(market_id),
+
+    selling_date DATE NOT NULL,
+
+    predicted_price DECIMAL(12, 2),
+
+    transport_cost DECIMAL(12, 2),
+    storage_cost DECIMAL(12, 2),
+
+    expected_revenue DECIMAL(14, 2),
+    expected_net_profit DECIMAL(14, 2),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- INDEXES
+-- Improve query performance
+-- ============================================================
+
+CREATE INDEX IF NOT EXISTS idx_market_prices_date
+ON market_prices(arrival_date);
+
+CREATE INDEX IF NOT EXISTS idx_market_prices_market
+ON market_prices(market_id);
+
+CREATE INDEX IF NOT EXISTS idx_market_prices_crop
+ON market_prices(crop_id);
+
+CREATE INDEX IF NOT EXISTS idx_market_prices_crop_market_date
+ON market_prices(crop_id, market_id, arrival_date);
+
+CREATE INDEX IF NOT EXISTS idx_weather_market_date
+ON weather_records(market_id, observation_date);
+
+CREATE INDEX IF NOT EXISTS idx_predictions_crop_market_date
+ON price_predictions(crop_id, market_id, forecast_date);
