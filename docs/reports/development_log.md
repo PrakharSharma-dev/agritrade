@@ -590,7 +590,461 @@ At this point the following components have been successfully established:
 └──────────────────────────────────────────┘
 ```
 
+# 16. Exploratory Data Analysis (EDA)
+
+## Objective
+
+After obtaining the historical Wheat mandi-price dataset, Exploratory Data Analysis was performed before beginning data cleaning, preprocessing, and database ingestion.
+
+The purpose of EDA was to understand:
+
+- Dataset structure and quality
+- Price distribution
+- Market-level price differences
+- Historical price trends
+- Observation frequency and data gaps
+- Possible seasonal patterns
+- Suitability of the dataset for time-series forecasting
+
+The EDA was implemented as a reusable Python script:
+
+```text
+scripts/eda.py
+```
+
+Python libraries used:
+
+```text
+pandas
+matplotlib
+```
+
 ---
+
+## 16.1 Market-wise Price Analysis
+
+A market-wise comparison of average Wheat modal prices was performed.
+
+The dataset contains seven market names:
+
+| Market | Records |
+|---|---:|
+| Madanganj Kishangarh | 1,048 |
+| Kekri | 683 |
+| Vijaynagar | 612 |
+| Gulabpura | 553 |
+| Madanganj Kishangarh APMC | 180 |
+| Beawar | 140 |
+| Kekri APMC | 102 |
+
+The analysis showed noticeable differences in average modal prices between markets.
+
+### Observation
+
+- Beawar showed the highest average modal price.
+- Madanganj Kishangarh APMC was also among the higher-priced markets.
+- The remaining markets had somewhat lower average modal prices.
+- Market price differences indicate that market selection can influence the potential selling outcome.
+
+### Important Decision
+
+Average price alone will **not** be used to determine the best market.
+
+The eventual recommendation system must also consider:
+
+```text
+Expected Selling Price
+        -
+Transportation Cost
+        -
+Storage Cost
+        =
+Estimated Net Profit
+```
+
+---
+
+## 16.2 Market-wise Price Trends
+
+A time-series plot was generated with a separate price trend for each market.
+
+### Observations
+
+- The markets show broadly similar long-term price movements.
+- Individual markets have different levels of volatility.
+- Beawar has relatively high prices but limited historical coverage.
+- Madanganj Kishangarh has substantially more historical observations.
+- The `APMC` market names appear during different periods and were therefore not automatically merged with similarly named markets.
+
+### Decision
+
+Each market will remain a separate market entity during preprocessing and forecasting.
+
+No automatic merging of:
+
+```text
+Madanganj Kishangarh
+Madanganj Kishangarh APMC
+```
+
+or:
+
+```text
+Kekri
+Kekri APMC
+```
+
+will be performed without further validation of the source data.
+
+---
+
+## 16.3 Observation Frequency and Data Gaps
+
+The number of Wheat price records per month was analyzed.
+
+The analysis showed that the total number of observations changes significantly over time.
+
+### Observation
+
+The number of records decreases substantially after 2024.
+
+This does not necessarily indicate a reduction in actual mandi activity. It is also influenced by changes in market coverage within the downloaded dataset.
+
+### Market Coverage
+
+| Market | Records | Start | End | Maximum Gap |
+|---|---:|---|---|---:|
+| Madanganj Kishangarh | 1,048 | Aug 2021 | Nov 2025 | 10 days |
+| Kekri | 683 | Aug 2021 | Jul 2024 | 17 days |
+| Vijaynagar | 612 | Aug 2021 | Jul 2024 | 39 days |
+| Gulabpura | 553 | Aug 2021 | Jul 2024 | 45 days |
+| Beawar | 140 | Aug 2021 | Jul 2024 | 98 days |
+| Madanganj Kishangarh APMC | 180 | Nov 2025 | Aug 2026 | 36 days |
+| Kekri APMC | 102 | Feb 2026 | Aug 2026 | 22 days |
+
+### Important Finding
+
+Madanganj Kishangarh has:
+
+- The largest number of observations
+- More than four years of historical coverage
+- A median observation gap of approximately one day
+- A maximum observed gap of only 10 days
+
+Therefore, it provides the strongest initial time-series for the MVP forecasting model.
+
+---
+
+## 16.4 Price Distribution Analysis
+
+A histogram of `Modal_Price` was generated.
+
+### Observation
+
+Most modal-price observations are concentrated approximately between:
+
+```text
+₹1,900 – ₹2,600
+```
+
+The distribution also contains a right-side tail extending to approximately:
+
+```text
+₹3,900
+```
+
+### Interpretation
+
+The dataset contains substantial price variation and a small number of high-price observations.
+
+These high values will **not** be automatically removed as outliers. They must first be investigated to determine whether they represent legitimate market observations.
+
+---
+
+## 16.5 Overall Price Trend
+
+A time-series scatter plot of Wheat modal prices was generated.
+
+### Observations
+
+The overall dataset shows:
+
+- An upward movement from 2021 into later years
+- Significant short-term fluctuations
+- A strong price increase around late 2024 and early 2025
+- A decline following the early-2025 peak
+- Relative stabilization around the ₹2,200–₹2,500 range during much of 2026
+
+### Interpretation
+
+The historical series contains both:
+
+```text
+Trend
++
+Short-term fluctuations
+```
+
+This indicates that time-series forecasting is a reasonable direction for the project.
+
+---
+
+## 16.6 Monthly Price Analysis
+
+Average Wheat modal price was calculated for each month of the year.
+
+The analysis showed visible month-to-month variation.
+
+Approximate pattern observed:
+
+```text
+January     → Higher average
+February    → Lower
+March       → Lower
+April       → Higher
+May         → Higher
+June        → Moderate
+July        → Moderate
+August      → Moderate
+September   → Lowest average
+October     → Recovery
+November    → Higher
+December    → Higher
+```
+
+### Important Limitation
+
+This calculation combines multiple markets with different historical coverage.
+
+Therefore, the observed monthly variation **cannot yet be treated as confirmed seasonal behavior**.
+
+A market-specific seasonality analysis will be performed for the selected forecasting market.
+
+---
+
+## 16.7 Rolling Average Analysis
+
+A 30-day rolling average was calculated for:
+
+```text
+Market: Madanganj Kishangarh
+Commodity: Wheat
+Target: Modal Price
+```
+
+### Observation
+
+The rolling average reduced daily noise and made the underlying price movement easier to observe.
+
+The broad pattern was:
+
+```text
+2021
+  ↓
+Gradual increase
+  ↓
+2022
+  ↓
+Relatively stable / rising
+  ↓
+2023
+  ↓
+Increase followed by correction
+  ↓
+2024
+  ↓
+Gradual increase
+  ↓
+Early 2025
+  ↓
+Strong peak
+  ↓
+2025
+  ↓
+Correction
+  ↓
+2026
+  ↓
+Relative stabilization / recovery
+```
+
+### Interpretation
+
+The rolling-average analysis supports the presence of meaningful temporal structure in the data and strengthens the case for investigating forecasting models.
+
+---
+
+## 16.8 Duplicate Observation Investigation
+
+Earlier data-quality analysis found:
+
+- **0 exact duplicate rows**
+- **6 duplicate date/market/commodity/variety/grade groups**
+- These groups correspond to **12 rows**
+
+The duplicate groups contain different price values.
+
+Example structure:
+
+```text
+Date + Market + Commodity + Variety + Grade
+                ↓
+        Multiple price observations
+```
+
+### Decision
+
+These records will **not be deleted automatically**.
+
+They may represent legitimate multiple observations from the source.
+
+For the forecasting dataset, we eventually need to determine an appropriate method for obtaining one daily target value per market.
+
+The aggregation strategy will be decided during preprocessing after further source validation.
+
+---
+
+# 17. EDA Conclusions
+
+The EDA established the following important conclusions:
+
+### 1. Dataset quality
+
+The raw dataset passed the initial structural quality checks:
+
+```text
+Missing values       → 0
+Exact duplicates     → 0
+Invalid dates        → 0
+Negative prices      → 0
+Zero prices         → 0
+Invalid price order  → 0
+```
+
+### 2. Market selection
+
+For the initial MVP forecasting model:
+
+> **Wheat at Madanganj Kishangarh** is selected as the primary forecasting series.
+
+### Reason
+
+It provides the strongest combination of:
+
+- Number of observations
+- Historical coverage
+- Temporal consistency
+- Relatively small observation gaps
+
+### 3. Market separation
+
+Markets will remain separate during preprocessing.
+
+APMC and non-APMC market names will not be merged without source validation.
+
+### 4. Forecasting suitability
+
+The data contains:
+
+- Long-term trend
+- Short-term fluctuations
+- Market-specific behavior
+- Possible seasonal effects
+
+Therefore, the dataset is suitable for further time-series forecasting investigation.
+
+### 5. Data preprocessing is required
+
+Before ML training, the following steps are required:
+
+```text
+Raw CSV
+   ↓
+Date parsing
+   ↓
+Price validation
+   ↓
+Market validation
+   ↓
+Duplicate-day investigation
+   ↓
+Missing-date analysis
+   ↓
+Daily target preparation
+   ↓
+Feature engineering
+   ↓
+Forecasting dataset
+```
+
+---
+
+# 18. Files Created / Updated During EDA
+
+```text
+scripts/
+└── eda.py
+
+data/
+└── raw/
+    └── wheat_daily_prices.csv
+```
+
+The raw CSV remains **unchanged** and must not be manually edited.
+
+The EDA script is reusable and can later be adapted for additional commodities or markets.
+
+---
+
+# 19. Current Development Checkpoint — After EDA
+
+```text
+┌──────────────────────────────────────────┐
+│              AGRITRADE                   │
+├──────────────────────────────────────────┤
+│ Project Planning                  ✅     │
+│ Data Source Investigation         ✅     │
+│ Historical Dataset Download       ✅     │
+│ Initial Data Quality Analysis     ✅     │
+│ Exploratory Data Analysis         ✅     │
+│ Git/GitHub                        ✅     │
+│ Project Structure                 ✅     │
+│ PostgreSQL                        ✅     │
+│ Database Schema                   ✅     │
+│ Seed Data                         ✅     │
+│ Python Environment                ✅     │
+│ EDA Script                        ✅     │
+├──────────────────────────────────────────┤
+│ Data Preprocessing                 ⏳    │
+│ PostgreSQL Data Ingestion          ⏳    │
+│ FastAPI Implementation             ⏳    │
+│ PostgreSQL Connection              ⏳    │
+│ ML Forecasting                     ⏳    │
+│ Optimization                       ⏳    │
+│ Frontend                           ⏳    │
+│ Integration                        ⏳    │
+│ Final Diagrams                     ⏳    │
+│ MVP                                ⏳    │
+└──────────────────────────────────────────┘
+```
+
+---
+
+# 🎯 Next Development Task
+
+The next technical phase is **Data Preprocessing**.
+
+Planned steps:
+
+1. Validate market names.
+2. Investigate multiple observations on the same date.
+3. Determine the daily target-price aggregation rule.
+4. Analyze missing dates for Madanganj Kishangarh.
+5. Create the cleaned dataset.
+6. Save the processed dataset separately from the raw CSV.
+7. Prepare the cleaned data for PostgreSQL ingestion.
+
+> **Important:** The original file in `data/raw/` will remain untouched.
 
 # 🎯 Next Development Task
 
@@ -618,21 +1072,7 @@ agritrade
 6. Test the database connection.
 7. Create the first API endpoint.
 
----
 
-# 📐 Documentation To Be Maintained
-
-The following diagrams will be developed and updated as the implementation progresses:
-
-- [ ] Use Case Diagram
-- [ ] Activity Diagram
-- [ ] ER Diagram
-- [ ] Class Diagram
-- [ ] System Architecture Diagram
-
-These diagrams will be synchronized with the actual implemented system rather than being created independently from the code.
-
----
 📝 Future Log Entry Format
 
 Every significant development session will follow this structure:
