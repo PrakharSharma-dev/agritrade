@@ -234,3 +234,9 @@ ON weather_records(market_id, observation_date);
 
 CREATE INDEX IF NOT EXISTS idx_predictions_crop_market_date
 ON price_predictions(crop_id, market_id, forecast_date);
+SELECT
+    conname,
+    pg_get_constraintdef(oid)
+FROM pg_constraint
+WHERE conrelid = 'market_prices'::regclass
+  AND contype = 'u';
