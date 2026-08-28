@@ -1072,6 +1072,778 @@ agritrade
 6. Test the database connection.
 7. Create the first API endpoint.
 
+## Week 3 — Data Preprocessing & PostgreSQL Integration
+
+**Date:** 27 August 2026  
+**Member:** Prakhar Sharma (Member 1)  
+**Phase:** Backend/Data Pipeline Development
+
+---
+
+## 1. Preprocessing Pipeline
+
+After completing the initial Exploratory Data Analysis (EDA), the raw mandi dataset was processed to prepare it for forecasting and database integration.
+
+### Dataset Used
+
+- Commodity: **Wheat**
+- Market: **Madanganj Kishangarh**
+- District: **Ajmer**
+- State: **Rajasthan**
+
+### Raw Dataset
+
+- Total raw records: **3,318**
+- Records for Madanganj Kishangarh: **1,048**
+
+### Preprocessing Operations
+
+The preprocessing script was created at:
+
+```text
+scripts/preprocess.py
+```
+
+The following operations were performed:
+
+1. Converted `Arrival_Date` into a proper date format.
+2. Filtered the dataset for the selected market.
+3. Validated required columns.
+4. Removed records with invalid or missing dates.
+5. Removed records with missing price values.
+6. Validated minimum, maximum and modal prices.
+7. Identified multiple observations occurring on the same date.
+8. Aggregated multiple observations for the same date.
+9. Sorted the resulting dataset chronologically.
+10. Performed final validation.
+11. Saved the cleaned dataset separately from the raw dataset.
+
+### Duplicate-Date Handling
+
+Five dates contained multiple observations.
+
+Since the forecasting dataset requires one observation per date, multiple observations were aggregated.
+
+The modal price was calculated using the arithmetic mean.
+
+The raw dataset was kept unchanged.
+
+### Missing-Date Handling
+
+The dataset does not contain observations for every calendar day.
+
+Most gaps were short and were treated as part of the market reporting pattern.
+
+Artificial prices were **not** created for missing dates.
+
+No forward-filling was performed.
+
+### Final Processed Dataset
+
+```text
+Records:          1,043
+Unique dates:     1,043
+Missing values:       0
+Duplicate dates:      0
+
+Start date:       2021-08-18
+End date:         2025-11-04
+```
+
+The processed dataset was saved as:
+
+```text
+data/processed/wheat_madanganj_kishangarh.csv
+```
+
+---
+
+## 2. PostgreSQL Database Integration
+
+The processed dataset was integrated with the project's PostgreSQL database.
+
+```text
+Database: agritrade
+Host: localhost
+Port: 5432
+```
+
+The PostgreSQL database contains the following major tables:
+
+```text
+crops
+farmer_requests
+market_prices
+markets
+price_predictions
+recommendations
+storage_costs
+transport_costs
+weather_records
+```
+
+### Crop and Market Setup
+
+The existing `crops` table contained:
+
+```text
+crop_id:   1
+crop_name: Wheat
+```
+
+The following market was added to the `markets` table:
+
+```text
+market_name: Madanganj Kishangarh
+district:    Ajmer
+state:       Rajasthan
+```
+
+The corresponding `market_id` was obtained from PostgreSQL and used for price-data insertion.
+
+---
+
+## 3. Data Loading Script
+
+A reusable PostgreSQL ingestion script was created:
+
+```text
+scripts/load_data.py
+```
+
+The script performs the following operations:
+
+1. Loads the processed CSV.
+2. Converts arrival dates into database-compatible dates.
+3. Connects to PostgreSQL.
+4. Retrieves the appropriate `crop_id`.
+5. Retrieves the appropriate `market_id`.
+6. Inserts market-price records into `market_prices`.
+7. Uses a database transaction.
+8. Rolls back the transaction if an error occurs.
+9. Reports inserted and skipped records.
+
+---
+
+## 4. Initial Database Import
+
+The first successful import inserted:
+
+```text
+1,043 records
+```
+
+The database was then verified using SQL queries.
+
+### Verification Results
+
+```text
+Total records: 1,043
+
+First date:    2021-08-18
+Last date:     2025-11-04
+```
+
+The inserted records were also verified through joins between:
+
+```text
+market_prices
+crops
+markets
+```
+
+The records correctly corresponded to:
+
+```text
+Commodity: Wheat
+Market:    Madanganj Kishangarh
+District:  Ajmer
+State:     Rajasthan
+```
+
+---
+
+## 5. Database-Level Duplicate Protection
+
+A unique constraint was added to the `market_prices` table:
+
+```sql
+UNIQUE (
+    market_id,
+    crop_id,
+    variety,
+    grade,
+    arrival_date
+)
+```
+
+Constraint name:
+
+```text
+market_prices_unique_observation
+```
+
+This ensures that the same market, crop, variety and grade cannot have multiple price observations for the same arrival date.
+
+The ingestion script was updated with:
+
+```sql
+ON CONFLICT (
+    market_id,
+    crop_id,
+    variety,
+    grade,
+    arrival_date
+)
+DO NOTHING
+```
+
+The loader was then tested again.
+
+### Re-import Test
+
+```text
+Records inserted: 0
+Records skipped:  1043
+```
+
+This confirmed that the loader is safely re-runnable and does not create duplicate records.
+
+---
+
+## 6. Database Credential Security
+
+Database credentials were moved from the Python source code into:
+
+```text
+.env
+```
+
+The Python package:
+
+```text
+python-dotenv
+```
+
+was installed to load the environment variables.
+
+The `.env` file contains the database configuration locally and is excluded from GitHub.
+
+A connection test confirmed:
+
+```text
+PostgreSQL connection successful
+```
+
+The actual database password is not stored in the source code.
+
+---
+
+## 7. Git and GitHub Security Verification
+
+The project's `.gitignore` was checked and verified.
+
+The following are ignored:
+
+```text
+.env
+.venv/
+data/
+ml/models/
+```
+
+Therefore:
+
+- Database credentials are not pushed.
+- Raw datasets are not pushed.
+- Processed datasets are not pushed.
+- Python virtual-environment files are not pushed.
+- Local ML model files are not pushed.
+
+The `.gitignore` itself is tracked by Git.
+
+---
+
+## 8. GitHub Checkpoint
+
+The following development files were committed and pushed to GitHub:
+
+```text
+database/schema.sql
+requirements.txt
+scripts/preprocess.py
+scripts/load_data.py
+```
+
+Commit message:
+
+```text
+Add data preprocessing and PostgreSQL ingestion
+```
+
+The repository is synchronized with the local development environment.
+
+---
+
+## 9. Current System State
+
+The data pipeline is now functional:
+
+```text
+Government Mandi Dataset
+        ↓
+Raw CSV
+        ↓
+EDA
+        ↓
+Preprocessing
+        ↓
+Clean Processed CSV
+        ↓
+Python Data Loader
+        ↓
+PostgreSQL
+        ↓
+market_prices
+        ↓
+1,043 verified records
+```
+
+---
+
+## 10. Current Checkpoint
+
+### Completed
+
+- [x] Government mandi dataset obtained
+- [x] EDA completed
+- [x] Market selected for initial forecasting
+- [x] Preprocessing script created
+- [x] Processed dataset generated
+- [x] PostgreSQL database configured
+- [x] Crop and market records configured
+- [x] 1,043 price records imported
+- [x] Database records verified
+- [x] Unique constraint added
+- [x] Duplicate-safe ingestion implemented
+- [x] `.env` credential management implemented
+- [x] `.gitignore` verified
+- [x] Changes committed and pushed to GitHub
+
+---
+
+## 11. Next Development Task
+
+The next major development phase is the **FastAPI backend**.
+
+Planned sequence:
+
+PostgreSQL Database
+        ↓
+FastAPI Backend
+        ↓
+Database connection layer
+        ↓
+API routes
+        ↓
+Market-price endpoints
+        ↓
+Forecast endpoints
+        ↓
+Recommendation endpoints
+        ↓
+Frontend integration
+```
+
+Initial API endpoints will focus on retrieving:
+
+- Available crops
+- Available markets
+- Historical market prices
+- Latest market prices
+
+Forecasting and farmer recommendations will be integrated after the basic API layer is operational.
+
+---
+
+## Checkpoint Status
+
+**🟢 DATA PIPELINE COMPLETE**
+
+**Next Phase: 🚀 FASTAPI BACKEND**
+### 1. FastAPI Backend Foundation
+
+After completing PostgreSQL integration and data validation, development was continued on the FastAPI backend.
+
+A reusable SQLAlchemy database connection layer was implemented in:
+
+```text
+backend/app/database.py
+```
+
+The connection uses environment variables loaded from `.env`.
+
+Database connection test:
+
+```text
+PostgreSQL connection successful
+```
+
+### 2. SQLAlchemy Models
+
+Models were created to represent the existing PostgreSQL tables:
+
+```text
+backend/app/models/
+├── crop.py
+├── market.py
+└── market_price.py
+```
+
+### 3. FastAPI Routers
+
+API routers were created:
+
+```text
+backend/app/routers/
+├── crops.py
+├── markets.py
+└── prices.py
+```
+
+Implemented endpoints:
+
+| Endpoint | Purpose | Status |
+|---|---|---|
+| `GET /api/crops/` | Retrieve available crops | ✅ |
+| `GET /api/markets/` | Retrieve available markets | ✅ |
+| `GET /api/prices/` | Retrieve historical market prices | ✅ |
+
+The endpoints were verified through FastAPI Swagger UI:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### 4. Historical Prices API
+
+The prices endpoint supports filtering by:
+
+```text
+crop_id
+market_id
+start_date
+end_date
+```
+
+Example:
+
+```text
+/api/prices/?crop_id=1&market_id=1
+```
+
+Date filtering:
+
+```text
+/api/prices/?crop_id=1&market_id=1&start_date=2024-01-01&end_date=2024-12-31
+```
+
+A successful `200` response was verified with actual PostgreSQL market-price records.
+
+Example verified record:
+
+```text
+price_id:      2
+market_id:     1
+crop_id:       1
+arrival_date:  2021-08-19
+min_price:     1740
+max_price:     1981
+modal_price:   1861
+variety:       Other
+grade:         FAQ
+price_unit:    ₹/quintal
+```
+
+### 5. Pydantic Response Schemas
+
+Response schemas were added:
+
+```text
+backend/app/schemas/
+├── crop.py
+├── market.py
+└── market_price.py
+```
+
+Response models:
+
+```text
+CropResponse
+MarketResponse
+MarketPriceResponse
+```
+
+These provide structured API responses and automatic Swagger documentation.
+
+### 6. Backend Architecture
+
+```text
+PostgreSQL
+    ↓
+SQLAlchemy Models
+    ↓
+FastAPI Routers
+    ↓
+Pydantic Response Schemas
+    ↓
+JSON API Response
+    ↓
+Frontend
+```
+
+## Current Checkpoint
+
+### Completed
+
+- [x] PostgreSQL connection through SQLAlchemy
+- [x] SQLAlchemy models for crops, markets and market prices
+- [x] Crops API
+- [x] Markets API
+- [x] Historical prices API
+- [x] Crop filtering
+- [x] Market filtering
+- [x] Date-range filtering
+- [x] Pydantic response schemas
+- [x] Swagger API documentation
+- [x] Successful API response verification
+
+**🟢 FASTAPI + POSTGRESQL API FOUNDATION COMPLETE**
+
+## Next Development Task
+
+The next backend improvement is **pagination for the prices endpoint**.
+
+Planned request:
+
+```text
+/api/prices/?skip=0&limit=50
+```
+
+This will prevent the frontend from loading all 1,043 historical records in a single request.
+
+Planned sequence:
+
+```text
+Pagination
+    ↓
+API validation
+    ↓
+Forecasting service
+    ↓
+Prediction endpoint
+    ↓
+Recommendation logic
+    ↓
+Frontend integration
+
+
+### 1. Backend/Data Layer Completion
+
+The core backend and database-access layer for the AgriTrade MVP has been implemented and verified.
+
+Completed components:
+
+- [x] PostgreSQL database configured
+- [x] Historical mandi dataset processed
+- [x] Processed data loaded into PostgreSQL
+- [x] Duplicate protection implemented
+- [x] Database credentials secured using `.env`
+- [x] `.gitignore` verified
+- [x] SQLAlchemy database connection implemented
+- [x] SQLAlchemy models implemented
+- [x] Pydantic response schemas implemented
+- [x] FastAPI application configured
+- [x] Swagger documentation verified
+
+---
+
+## 2. Implemented API Endpoints
+
+| Endpoint | Purpose | Status |
+|---|---|---|
+| `GET /api/crops/` | Retrieve available crops | ✅ |
+| `GET /api/markets/` | Retrieve available markets | ✅ |
+| `GET /api/prices/` | Retrieve historical market prices | ✅ |
+
+The APIs were tested using FastAPI Swagger UI.
+
+---
+
+## 3. Prices API Features
+
+The historical prices endpoint supports:
+
+### Crop Filtering
+
+```text
+/api/prices/?crop_id=1
+```
+
+### Market Filtering
+
+```text
+/api/prices/?market_id=1
+```
+
+### Date-Range Filtering
+
+```text
+/api/prices/?start_date=2024-01-01&end_date=2024-12-31
+```
+
+### Pagination
+
+```text
+/api/prices/?skip=0&limit=10
+```
+
+Pagination was tested successfully, including pagination combined with crop, market and date filters.
+
+The endpoint supports:
+
+```text
+crop_id        ✅
+market_id      ✅
+start_date     ✅
+end_date       ✅
+skip           ✅
+limit          ✅
+response model ✅
+```
+
+---
+
+## 4. Current Backend Architecture
+
+```text
+PostgreSQL
+     ↓
+SQLAlchemy
+     ↓
+FastAPI Routers
+     ↓
+Pydantic Response Schemas
+     ↓
+JSON API
+     ↓
+Frontend
+```
+
+The backend provides the frontend with access to crop, market and historical price data.
+
+---
+
+## 5. ML Development Handoff
+
+With the core backend/data-access layer completed, the next development phase is the **Machine Learning / Forecasting module**.
+
+Planned ML workflow:
+
+```text
+Historical price data
+        ↓
+Feature preparation
+        ↓
+Feature engineering
+        ↓
+Time-aware train/validation/test split
+        ↓
+Baseline model
+        ↓
+Model experiments
+        ↓
+Model evaluation
+        ↓
+Best-performing model
+        ↓
+Saved model artifact
+        ↓
+FastAPI forecast integration
+```
+
+### ML Responsibilities
+
+The ML development work will focus on:
+
+- Preparing forecasting features.
+- Creating a time-aware training and validation strategy.
+- Establishing a baseline forecast.
+- Training candidate forecasting models.
+- Comparing model performance.
+- Evaluating predictions using appropriate metrics.
+- Selecting the best-performing model.
+- Saving the trained model for backend integration.
+
+### Important Development Principle
+
+The forecasting workflow should use chronologically ordered data so that future observations do not influence training on earlier observations.
+
+---
+
+## 6. Backend–ML Integration Plan
+
+After the ML member completes and validates the forecasting model, it will be integrated with the existing FastAPI backend.
+
+```text
+Historical PostgreSQL Data
+          ↓
+     ML Forecasting
+          ↓
+    Saved Model
+          ↓
+   Forecast Service
+          ↓
+FastAPI /api/forecast/
+          ↓
+      Frontend
+```
+
+The backend will expose predictions through an API, while the ML component will handle feature engineering, model training and evaluation.
+
+---
+
+## 7. Current Project Checkpoint
+
+### Completed
+
+```text
+Data acquisition             ✅
+EDA                          ✅
+Preprocessing                ✅
+PostgreSQL ingestion         ✅
+Database verification        ✅
+Credential security          ✅
+Duplicate protection         ✅
+SQLAlchemy                   ✅
+FastAPI foundation           ✅
+API routes                   ✅
+Pydantic schemas             ✅
+Filtering                    ✅
+Pagination                   ✅
+Swagger verification         ✅
+```
+
+### Current Status
+
+**🟢 CORE BACKEND + DATA ACCESS LAYER COMPLETE**
+
+### Next Phase
+
+**🤖 MACHINE LEARNING / PRICE FORECASTING**
+
+The next implementation task is to prepare the historical price data for time-series forecasting and establish a baseline model.
+```
 
 📝 Future Log Entry Format
 
