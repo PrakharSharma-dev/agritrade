@@ -1,0 +1,22 @@
+Step 1 — Open the project root
+
+C:\Users\13456\OneDrive\Desktop\agritrade
+
+
+Step 2 — Activate your virtual environment
+
+If it isn't already active:
+.\.venv\Scripts\Activate.ps1
+
+
+
+
+Step 3 — Start FastAPI
+python -m uvicorn backend.app.main:app --reload
+
+
+
+
+Step 4 — Open Swagger UI
+
+http://127.0.0.1:8000/docs
