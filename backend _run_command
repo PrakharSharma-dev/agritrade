@@ -20,3 +20,116 @@ python -m uvicorn backend.app.main:app --reload
 Step 4 — Open Swagger UI
 
 http://127.0.0.1:8000/docs
+
+
+new setup on another pc
+Step 2. Install the required software
+On your friend's PC, install:
+- Python — preferably a version compatible with your project's dependencies.
+- PostgreSQL.
+- VS Code.
+- The Python extension for VS Code.
+If you're using GitHub, install Git too.
+Step 3. Open the project in VS Code
+Open the agritrade project root folder, then select Terminal → New Terminal.
+
+Make sure the terminal is at the project root, where the backend folder is located.
+Step 4. Create a new virtual environment
+In PowerShell, run:
+python -m venv .venv
+
+
+Activate it:
+.\.venv\Scripts\Activate.ps1
+
+
+Your terminal should now show (.venv).
+
+If PowerShell blocks activation, you can use Command Prompt instead:
+.venv\Scripts\activate.bat
+
+
+Step 5. Install Python dependencies
+If your project has a requirements.txt, run:
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+
+If that file doesn't exist, don't guess which packages to install. We should first inspect your imports and dependency list on your original PC.
+Step 6. Configure PostgreSQL
+On your friend's PC:
+1. Start PostgreSQL.
+2. Create a database for AgriTrade.
+3. Create or configure a PostgreSQL user and password.
+4. Create a .env file in the location expected by your backend.
+5. Update its database connection settings to match the new PC.
+For example, your connection configuration may look like this:
+DATABASE_URL=postgresql://USERNAME:PASSWORD@localhost:5432/DATABASE_NAME
+
+
+Use the variable name your existing database.py expects; don't replace it blindly.
+
+Remember: Your .env credentials from your PC will not automatically work on your friend's PC. Never commit passwords to GitHub.
+Step 7. Load the project data
+Your PostgreSQL database needs the tables and historical market-price data.
+
+If the database isn't already populated, you must:
+1. Create the required tables using your existing project setup.
+2. Import the prepared mandi-price dataset.
+3. Verify that the crop, market, and price records exist.
+Don't assume that copying the Python code also copies the database.
+Step 8. Start the backend
+This is the command that currently works for your project.
+
+Make sure you're in the project root, not inside backend.
+
+Run:
+python -m uvicorn backend.app.main:app --reload
+
+
+You should see a message similar to:
+Uvicorn running on http://127.0.0.1:8000
+
+
+Keep this terminal open while testing.
+Step 9. Test Swagger UI
+Open your browser:
+Swagger UI
+
+http://127.0.0.1:8000/docs
+
+Interactive API testing page
+
+
+
+Test these endpoints using Try it out → Execute:
+- GET /api/crops/
+- GET /api/markets/
+- GET /api/prices/?skip=0&limit=10
+
+Check that the responses contain the expected data, not just a successful HTTP status.
+Step 10. Common problems
+Error	What to check
+ModuleNotFoundError	Correct environment, installed dependencies, project root, and imports
+Database connection refused	PostgreSQL is running and connection settings are correct
+Authentication failed	PostgreSQL username and password
+relation does not exist	Database tables haven't been created or imported
+Port 8000 already in use	Stop the other server or use a different port
+
+Final checklist
+Setup progress
+
+0 of 8
+
+
+
+[ ] Project copied or cloned successfully
+[ ] Python virtual environment created and activated
+[ ] Dependencies installed
+[ ] PostgreSQL database created
+[ ] Environment variables configured
+[ ] Tables and market-price data loaded
+[ ] FastAPI starts from the project root
+[ ] All three existing APIs return expected data
+
+My recommendation: Before going to your friend's PC, confirm you have requirements.txt, the correct .env variable names, and a database export or the processed CSV ready. Those three things prevent most setup problems.
