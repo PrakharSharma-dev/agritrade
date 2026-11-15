@@ -109,3 +109,20 @@ build/
 *.sql.gz
 *.sqlite
 *.sqlite3
+
+
+# Python virtual environments
+.venv/
+.venv312/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# IDE
+.vscode/

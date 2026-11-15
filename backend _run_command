@@ -7,6 +7,8 @@ Step 2 — Activate your virtual environment
 
 If it isn't already active:
 .\.venv\Scripts\Activate.ps1
+.\.venv312\Scripts\Activate.ps1
+python -m uvicorn backend.app.main:app --reload
 
 
 
