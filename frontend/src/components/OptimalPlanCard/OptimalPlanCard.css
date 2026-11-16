@@ -1,0 +1,207 @@
+.optimal-plan-card {
+  position: relative;
+  padding: 32px;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 50%, #fefce8 100%);
+  border: 2px solid var(--amber-400);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 14px 35px -5px rgba(217, 119, 6, 0.15), 0 0 20px rgba(45, 106, 79, 0.08);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.banner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--amber-500) 0%, var(--amber-600) 100%);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  margin-bottom: 18px;
+  box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3);
+}
+
+.star-icon {
+  font-size: 0.95rem;
+}
+
+.plan-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.recommendation-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-700);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.target-headline {
+  font-size: 1.95rem;
+  color: var(--primary-900);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.highlight-market {
+  color: var(--amber-600);
+  text-decoration: underline;
+  text-decoration-color: var(--amber-300);
+  text-underline-offset: 4px;
+}
+
+.plan-explanation {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 650px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.net-profit-badge-container {
+  flex-shrink: 0;
+}
+
+.profit-pill {
+  background: linear-gradient(135deg, var(--primary-800) 0%, var(--primary-900) 100%);
+  padding: 18px 24px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 10px 25px rgba(27, 67, 50, 0.25);
+  min-width: 220px;
+}
+
+.profit-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-300);
+  margin-bottom: 4px;
+}
+
+.profit-amount {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.profit-note {
+  font-size: 0.75rem;
+  color: var(--primary-300);
+  margin-top: 2px;
+}
+
+.parameters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.param-box {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.param-box:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-400);
+  box-shadow: var(--shadow-sm);
+}
+
+.param-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--surface-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.param-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.param-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.param-value {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.param-value small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.advisory-notice {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px dashed var(--amber-400);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notice-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.notice-text {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .optimal-plan-card {
+    padding: 20px;
+  }
+  .target-headline {
+    font-size: 1.5rem;
+  }
+  .profit-pill {
+    width: 100%;
+  }
+  .net-profit-badge-container {
+    width: 100%;
+  }
+}

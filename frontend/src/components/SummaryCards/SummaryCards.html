@@ -1,0 +1,88 @@
+<div class="summary-cards-grid">
+  <!-- Card 1: Current Price -->
+  <div class="summary-card glass-card">
+    <div class="card-top">
+      <span class="card-label">Current Market Price</span>
+      <div class="icon-bubble bubble-neutral">
+        <span>📊</span>
+      </div>
+    </div>
+
+<!-- Real ML Predicted Price -->
+<div class="summary-card glass-card card-accent-glow">
+  <div class="card-top">
+    <span class="card-label">ML Predicted Price</span>
+    <div class="icon-bubble bubble-blue">
+      <span>🤖</span>
+    </div>
+  </div>
+
+  <div class="card-main-val">
+    <span class="val-number">
+      {{ predictedPrice > 0 ? formatINR(predictedPrice) : 'N/A' }}
+    </span>
+    <span class="val-unit">/ quintal</span>
+  </div>
+
+  <div class="card-footer">
+    <span class="subtext">Next recorded observation · ML model</span>
+  </div>
+</div>
+
+    <div class="card-main-val">
+      <span class="val-number">{{ formatINR(currentPrice) }}</span>
+      <span class="val-unit">/ quintal</span>
+    </div>
+    <div class="card-footer">
+      <span class="subtext">Baseline spot price at local mandi</span>
+    </div>
+  </div>
+
+  <!-- Card 2: Recommended Market -->
+  <div class="summary-card glass-card card-accent-glow">
+    <div class="card-top">
+      <span class="card-label">Recommended Market</span>
+      <div class="icon-bubble bubble-amber">
+        <span>⭐</span>
+      </div>
+    </div>
+    <div class="card-main-val">
+      <span class="val-text">{{ recommendedMarket }}</span>
+    </div>
+    <div class="card-footer">
+      <span class="badge badge-recommended">Optimal Net Return</span>
+    </div>
+  </div>
+
+  <!-- Card 3: Recommended Selling Date -->
+  <div class="summary-card glass-card">
+    <div class="card-top">
+      <span class="card-label">Recommended Selling Date</span>
+      <div class="icon-bubble bubble-blue">
+        <span>📅</span>
+      </div>
+    </div>
+    <div class="card-main-val">
+      <span class="val-text">{{ recommendedDate }}</span>
+    </div>
+    <div class="card-footer">
+      <span class="subtext">Estimated peak pricing window</span>
+    </div>
+  </div>
+
+  <!-- Card 4: Expected Net Profit -->
+  <div class="summary-card glass-card card-profit-highlight">
+    <div class="card-top">
+      <span class="card-label">Expected Net Profit</span>
+      <div class="icon-bubble bubble-emerald">
+        <span>💵</span>
+      </div>
+    </div>
+    <div class="card-main-val">
+      <span class="val-number profit-number">{{ formatINR(expectedProfit) }}</span>
+    </div>
+    <div class="card-footer">
+      <span class="badge badge-emerald">After Storage & Transport</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,155 @@
+.cost-analysis-card {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-header {
+  margin-bottom: 18px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  color: var(--primary-900);
+}
+
+.card-subtitle {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.cost-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cost-card-item {
+  background: var(--surface-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.total-cost-card {
+  background: linear-gradient(135deg, var(--surface-muted) 0%, #ffffff 100%);
+  border-color: var(--primary-300);
+}
+
+.cost-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cost-item-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.transport-icon {
+  background: var(--blue-100);
+}
+
+.storage-icon {
+  background: var(--amber-100);
+}
+
+.total-icon {
+  background: var(--primary-100);
+}
+
+.cost-item-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.cost-item-label {
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cost-item-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.cost-item-val {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.total-val {
+  color: var(--primary-800);
+}
+
+.cost-bar-container {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-light);
+}
+
+.cost-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+}
+
+.bar-title {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.bar-ratio {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.split-progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-muted);
+  display: flex;
+  overflow: hidden;
+}
+
+.progress-segment {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.transport-segment {
+  background: var(--blue-500);
+}
+
+.storage-segment {
+  background: var(--amber-500);
+}

@@ -1,0 +1,167 @@
+.market-comparison-card {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-header {
+  margin-bottom: 18px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  color: var(--primary-900);
+}
+
+.card-subtitle {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.markets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.market-item-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  border: 1.5px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.market-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--primary-300);
+}
+
+.is-recommended-market {
+  background: linear-gradient(135deg, #ffffff 0%, var(--amber-50) 100%);
+  border-color: var(--amber-400);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+}
+
+.market-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.market-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--surface-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.is-recommended-market .market-icon-box {
+  background: var(--amber-100);
+}
+
+.market-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.market-name {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.market-meta {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.market-price-box {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.price-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.price-value-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.price-amount {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.is-recommended-market .price-amount {
+  color: #92400e;
+}
+
+.price-unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.comparison-footer {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-light);
+}
+
+.footer-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .market-item-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .market-price-box {
+    text-align: left;
+    margin-top: 6px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

@@ -1,0 +1,76 @@
+<div class="cost-analysis-card glass-card">
+  <div class="card-header">
+    <div>
+      <div class="title-row">
+        <h3 class="card-title">Logistics & Storage Cost Analysis</h3>
+        <span class="badge badge-emerald">Cost Breakdown</span>
+      </div>
+      <p class="card-subtitle">Estimated deductions required to reach optimal destination & time</p>
+    </div>
+  </div>
+
+  <!-- Breakdown items -->
+  <div class="cost-items-grid">
+    <!-- Transportation Card -->
+    <div class="cost-card-item">
+      <div class="cost-item-header">
+        <div class="cost-item-icon transport-icon">🚚</div>
+        <div class="cost-item-meta">
+          <span class="cost-item-label">Transportation Cost</span>
+          <span class="cost-item-sub">Transit to target mandi</span>
+        </div>
+      </div>
+      <div class="cost-item-val">
+        {{ formatINR(transportCost) }}
+      </div>
+    </div>
+
+    <!-- Storage Card -->
+    <div class="cost-card-item">
+      <div class="cost-item-header">
+        <div class="cost-item-icon storage-icon">🏠</div>
+        <div class="cost-item-meta">
+          <span class="cost-item-label">Storage Cost</span>
+          <span class="cost-item-sub">Holding till best date</span>
+        </div>
+      </div>
+      <div class="cost-item-val">
+        {{ formatINR(storageCost) }}
+      </div>
+    </div>
+
+    <!-- Total Cost Card -->
+    <div class="cost-card-item total-cost-card">
+      <div class="cost-item-header">
+        <div class="cost-item-icon total-icon">📊</div>
+        <div class="cost-item-meta">
+          <span class="cost-item-label">Total Cost</span>
+          <span class="cost-item-sub">Combined logistics</span>
+        </div>
+      </div>
+      <div class="cost-item-val total-val">
+        {{ formatINR(computedTotalCost) }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost Distribution Bar -->
+  <div class="cost-bar-container">
+    <div class="cost-bar-header">
+      <span class="bar-title">Cost Distribution</span>
+      <span class="bar-ratio">🚚 {{ transportPct }}% Transport | 🏠 {{ storagePct }}% Storage</span>
+    </div>
+    <div class="split-progress-bar">
+      <div
+        class="progress-segment transport-segment"
+        :style="{ width: `${transportPct}%` }"
+        title="Transportation Cost"
+      ></div>
+      <div
+        class="progress-segment storage-segment"
+        :style="{ width: `${storagePct}%` }"
+        title="Storage Cost"
+      ></div>
+    </div>
+  </div>
+</div>

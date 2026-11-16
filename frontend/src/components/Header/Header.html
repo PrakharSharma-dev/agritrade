@@ -1,0 +1,35 @@
+<header class="app-header">
+  <div class="header-container">
+    <div class="brand-section">
+      <div class="brand-icon-wrapper">
+        <span class="brand-icon">🌾</span>
+        <span class="brand-badge-pulse"></span>
+      </div>
+      <div>
+        <div class="brand-title-row">
+          <h1 class="brand-name">AgriTrade</h1>
+        </div>
+        <p class="brand-tagline">Intelligent Agricultural Market Decision & Profit Optimization System</p>
+      </div>
+    </div>
+
+    <div class="header-meta">
+      <!-- User Authenticated Profile Pill -->
+      <div v-if="userEmail" class="user-auth-pill">
+        <span class="user-avatar">👨‍🌾</span>
+        <div class="user-info">
+          <span class="user-role">Farmer Account</span>
+          <span class="user-email-text">{{ userEmail }}</span>
+        </div>
+        <button class="btn-logout" @click="handleLogout" title="Sign out of AgriTrade">
+          🚪 Logout
+        </button>
+      </div>
+
+      <div v-else class="portal-badge">
+        <span class="badge-label">Portal</span>
+        <span class="badge-val">Farmer Decision UI</span>
+      </div>
+    </div>
+  </div>
+</header>

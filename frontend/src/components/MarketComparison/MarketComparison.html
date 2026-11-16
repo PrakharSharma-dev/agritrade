@@ -1,0 +1,55 @@
+<div class="market-comparison-card glass-card">
+  <div class="card-header">
+    <div>
+      <div class="title-row">
+        <h3 class="card-title">Market Price Comparison</h3>
+        <span class="badge badge-emerald">Candidate Mandis</span>
+      </div>
+      <p class="card-subtitle">Comparative evaluation across neighboring regional APMC mandis</p>
+    </div>
+  </div>
+
+  <!-- Markets List / Grid -->
+  <div class="markets-list">
+    <div
+      v-for="m in markets"
+      :key="m.market"
+      :class="['market-item-card', { 'is-recommended-market': m.is_recommended || m.market.includes(recommendedMarketName) }]"
+    >
+      <div class="market-info">
+        <div class="market-icon-box">
+          <span>{{ m.is_recommended || m.market.includes(recommendedMarketName) ? '⭐' : '🏛️' }}</span>
+        </div>
+        <div>
+          <div class="market-title-row">
+            <h4 class="market-name">{{ m.market }}</h4>
+            <span
+              v-if="m.is_recommended || m.market.includes(recommendedMarketName)"
+              class="badge badge-recommended"
+            >
+              Recommended
+            </span>
+          </div>
+          <div class="market-meta">
+            <span v-if="m.location">📍 {{ m.location }}</span>
+            <span v-if="m.distance_km">• {{ m.distance_km }} km away</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="market-price-box">
+        <span class="price-label">Predicted Price</span>
+        <div class="price-value-row">
+          <span class="price-amount">{{ formatINR(m.predicted_price) }}</span>
+          <span class="price-unit">/ quintal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="comparison-footer">
+    <span class="footer-note">
+      💡 Note: Recommendations account for local mandi prices, transport distances, and storage duration.
+    </span>
+  </div>
+</div>

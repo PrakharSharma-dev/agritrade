@@ -1,0 +1,11 @@
+<div id="agritrade-app-root">
+  <Dashboard
+    v-if="isAuthenticated"
+    :user-email="currentUserEmail"
+    @logout="handleLogout"
+  />
+  <Login
+    v-else
+    @login-success="handleLoginSuccess"
+  />
+</div>

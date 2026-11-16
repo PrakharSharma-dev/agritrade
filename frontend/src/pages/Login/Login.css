@@ -1,0 +1,340 @@
+.login-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-shape-1 {
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(82, 183, 136, 0.25) 0%, rgba(216, 243, 220, 0.05) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bg-shape-2 {
+  position: absolute;
+  bottom: -120px;
+  left: -120px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(254, 243, 199, 0.02) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.login-card-container {
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  z-index: 10;
+}
+
+.login-brand-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.brand-logo-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+  border: 1.5px solid var(--primary-300);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 20px rgba(45, 106, 79, 0.15);
+}
+
+.logo-emoji {
+  font-size: 32px;
+}
+
+.login-brand-name {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-700) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+
+.login-brand-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.login-card {
+  padding: 36px 32px;
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  border: 1.5px solid rgba(45, 106, 79, 0.18);
+  box-shadow: 0 20px 40px -10px rgba(27, 67, 50, 0.12);
+}
+
+.login-card-top {
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 1.4rem;
+  color: var(--primary-900);
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.email-input {
+  font-size: 1.05rem;
+  padding: 14px 16px;
+}
+
+.login-btn {
+  height: 52px;
+  font-size: 1.05rem;
+  margin-top: 6px;
+}
+
+.error-msg {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #be123c;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-security-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border-light);
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  justify-content: center;
+}
+
+/* Modal Overlay */
+.otp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  animation: fadeIn 0.25s ease;
+}
+
+.otp-modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: 32px 28px;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  border: 2px solid var(--amber-400);
+}
+
+.btn-close-modal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--surface-muted);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.otp-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.otp-icon-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--amber-100);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.otp-modal-title {
+  font-size: 1.35rem;
+  color: var(--primary-900);
+}
+
+.otp-modal-sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.otp-modal-sub strong {
+  color: var(--primary-800);
+}
+
+/* DEMO OTP Banner inside Overlay */
+.demo-otp-banner {
+  background: linear-gradient(135deg, var(--amber-50) 0%, #ffffff 100%);
+  border: 1.5px dashed var(--amber-400);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.otp-banner-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.725rem;
+  font-weight: 800;
+  color: var(--amber-600);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber-500);
+  animation: dotPulse 1.2s infinite;
+}
+
+.otp-display-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.otp-code-digits {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  color: #92400e;
+}
+
+.btn-copy-otp {
+  background: var(--amber-500);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.775rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.2s;
+}
+
+.btn-copy-otp:hover {
+  background: var(--amber-600);
+}
+
+.otp-banner-hint {
+  font-size: 0.725rem;
+  color: var(--text-muted);
+}
+
+.otp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.otp-input-field {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  padding: 12px;
+}
+
+.verify-btn {
+  height: 48px;
+  font-size: 1rem;
+}
+
+.otp-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--primary-700);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}

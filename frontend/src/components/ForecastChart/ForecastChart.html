@@ -1,0 +1,159 @@
+<div class="forecast-chart-card glass-card">
+  <div class="chart-header">
+    <div>
+      <div class="title-with-badge">
+        <h3 class="chart-title">7-Day Market Price Forecast</h3>
+        <span class="badge badge-blue">ML Forecast Model</span>
+      </div>
+      <p class="chart-subtitle">Predicted mandi prices over the next 7 days (₹ per quintal)</p>
+    </div>
+
+    <div class="peak-callout" v-if="peakPoint">
+      <span class="peak-label">Predicted Peak:</span>
+      <span class="peak-value">{{ formatINR(peakPoint.predicted_price) }}</span>
+      <span class="peak-day">({{ peakPoint.day }})</span>
+    </div>
+  </div>
+
+  <!-- Chart Container -->
+  <div class="chart-svg-container">
+    <svg
+      :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
+      class="forecast-svg"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <defs>
+        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2d6a4f" stop-opacity="0.35" />
+          <stop offset="60%" stop-color="#52b788" stop-opacity="0.1" />
+          <stop offset="100%" stop-color="#52b788" stop-opacity="0.0" />
+        </linearGradient>
+        <filter id="pointShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1b4332" flood-opacity="0.3"/>
+        </filter>
+      </defs>
+
+      <!-- Grid Lines & Y-Axis Labels -->
+      <g class="grid-lines">
+        <g v-for="tick in yTicks" :key="tick.val">
+          <line
+            :x1="padding.left"
+            :y1="tick.y"
+            :x2="svgWidth - padding.right"
+            :y2="tick.y"
+            class="grid-line"
+          />
+          <text
+            :x="padding.left - 8"
+            :y="tick.y + 4"
+            class="y-axis-label"
+            text-anchor="end"
+          >
+            ₹{{ tick.val }}
+          </text>
+        </g>
+      </g>
+
+      <!-- Area Fill -->
+      <path :d="areaPath" fill="url(#chartGradient)" />
+
+      <!-- Main Trend Line -->
+      <path :d="linePath" class="trend-line" />
+
+      <!-- Active Hover Indicator Line -->
+      <g v-if="hoveredIndex !== null && points[hoveredIndex]">
+        <line
+          :x1="points[hoveredIndex].x"
+          :y1="padding.top"
+          :x2="points[hoveredIndex].x"
+          :y2="padding.top + chartHeight"
+          class="hover-cursor-line"
+        />
+      </g>
+
+      <!-- Data Points -->
+      <g class="data-points">
+        <g
+          v-for="(p, i) in points"
+          :key="p.date || i"
+          class="point-group"
+          @mouseenter="hoveredIndex = i"
+          @mouseleave="hoveredIndex = null"
+        >
+          <!-- Invisible larger hit area for hover -->
+          <circle
+            :cx="p.x"
+            :cy="p.y"
+            r="16"
+            fill="transparent"
+            class="hover-target"
+          />
+
+          <!-- Outer Pulse / Highlight on Peak or Hover -->
+          <circle
+            v-if="hoveredIndex === i || (peakPoint && p.index === peakPoint.index)"
+            :cx="p.x"
+            :cy="p.y"
+            :r="hoveredIndex === i ? 9 : 7"
+            :class="['point-pulse', { 'peak-pulse': p.index === peakPoint.index }]"
+          />
+
+          <!-- Core Circle -->
+          <circle
+            :cx="p.x"
+            :cy="p.y"
+            :r="hoveredIndex === i ? 6 : 4.5"
+            :class="['core-point', { 'is-peak': p.index === peakPoint.index }]"
+            filter="url(#pointShadow)"
+          />
+
+          <!-- X-Axis Labels -->
+          <text
+            :x="p.x"
+            :y="svgHeight - 12"
+            class="x-axis-label"
+            text-anchor="middle"
+          >
+            {{ p.day }}
+          </text>
+        </g>
+      </g>
+    </svg>
+
+    <!-- Floating Interactive HTML Tooltip -->
+    <div
+      v-if="hoveredIndex !== null && points[hoveredIndex]"
+      class="interactive-tooltip"
+      :style="{
+        left: `${(points[hoveredIndex].x / svgWidth) * 100}%`,
+        top: `${(points[hoveredIndex].y / svgHeight) * 100}%`
+      }"
+    >
+      <div class="tooltip-header">
+        <span class="tooltip-day">{{ points[hoveredIndex].day }}</span>
+        <span class="tooltip-date">{{ points[hoveredIndex].date }}</span>
+      </div>
+      <div class="tooltip-price">
+        {{ formatINR(points[hoveredIndex].predicted_price) }}
+        <span class="tooltip-unit">/ quintal</span>
+      </div>
+      <div v-if="peakPoint && points[hoveredIndex].index === peakPoint.index" class="tooltip-peak-tag">
+        ⭐ Highest Forecasted Price
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Legend / Summary Table -->
+  <div class="forecast-pills-row">
+    <div
+      v-for="(item, idx) in forecastData"
+      :key="item.day"
+      :class="['forecast-pill', { active: hoveredIndex === idx, 'is-peak-pill': peakPoint && idx === peakPoint.index }]"
+      @mouseenter="hoveredIndex = idx"
+      @mouseleave="hoveredIndex = null"
+    >
+      <span class="pill-day">{{ item.day }}</span>
+      <span class="pill-price">{{ formatINR(item.predicted_price) }}</span>
+    </div>
+  </div>
+</div>

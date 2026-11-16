@@ -1,0 +1,120 @@
+<div class="agritrade-dashboard-page">
+  <Header :user-email="userEmail" @logout="handleLogout" />
+
+  <main class="dashboard-main">
+    <div class="content-container">
+      <!-- 1. Farmer Input Section -->
+      <section class="section-block input-section">
+        <FarmerInput
+          :loading="loading"
+          @submit-query="handleFarmerSubmit"
+        />
+      </section>
+
+      <!-- 2. Loading State -->
+      <section v-if="loading" class="section-block">
+        <LoadingState
+          message="Analyzing market conditions..."
+          subtext="Simulating real-time mandi feeds, forecasting 7-day crop price trajectories, and determining logistics & holding costs..."
+        />
+      </section>
+
+      <!-- 3. Error State -->
+      <section v-else-if="error" class="section-block">
+        <div class="error-banner glass-card">
+          <div class="error-icon">⚠️</div>
+          <div class="error-content">
+            <h4 class="error-title">Recommendation Failed</h4>
+            <p class="error-text">{{ error }}</p>
+          </div>
+          <button class="btn-retry" @click="handleRetry">
+            🔄 Try Again
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. Dashboard Results View (Shown only after recommendation is received) -->
+      <section v-else-if="resultData" class="section-block results-section">
+        <!-- Action Bar with Quick Controls -->
+        <div class="results-header-bar">
+          <div class="results-summary-pill">
+            <span class="pill-dot"></span>
+            <span>Showing optimal selling plan for <strong>{{ resultData.crop }}</strong> from <strong>{{ resultData.farmer_location }}</strong> ({{ resultData.quantity }} kg)</span>
+          </div>
+          <button class="btn-reset" @click="handleReset" title="Clear results and start new inquiry">
+            ✕ Clear Results
+          </button>
+        </div>
+
+        <!-- A. 4 Key Metric Summary Cards -->
+        <SummaryCards
+         :current-price="predictionData
+           ? Number(predictionData.latest_modal_price)
+           : Number(resultData.current_price)"
+         :recommended-market="resultData.recommendation.market"
+         :recommended-date="resultData.recommendation.date"
+         :expected-profit="resultData.recommendation.expected_profit"
+        :predicted-price="predictionData
+           ? Number(predictionData.predicted_price)
+             : 0"
+        />
+
+<div v-if="predictionData" class="results-summary-pill" style="margin-top: 12px;">
+  <span class="pill-dot"></span>
+  Real ML prediction received from FastAPI.
+  Latest observation: {{ predictionData.latest_observation_date }}
+  · Model: {{ predictionData.model }}
+</div>
+
+<div v-else-if="predictionError" class="error-text" style="margin-top: 12px;">
+  ML prediction unavailable: {{ predictionError }}
+</div>
+
+
+
+        <!-- B. Prominent Optimal Selling Plan Card -->
+        <OptimalPlanCard
+          :recommendation="resultData.recommendation"
+          :crop="resultData.crop"
+          :quantity="resultData.quantity"
+        />
+
+        <!-- C. 7-Day Forecast Line Chart -->
+        <ForecastChart
+          :forecast-data="resultData.forecast"
+          :recommended-date="resultData.recommendation.date"
+        />
+
+        <!-- D. Two Column Grid: Market Comparison & Logistics Breakdown -->
+        <div class="results-two-col-grid">
+          <MarketComparison
+            :markets="resultData.markets"
+            :recommended-market-name="resultData.recommendation.market"
+          />
+          <CostAnalysis
+            :transport-cost="resultData.recommendation.transport_cost"
+            :storage-cost="resultData.recommendation.storage_cost"
+            :total-cost="resultData.recommendation.total_cost"
+          />
+        </div>
+      </section>
+
+      <!-- 5. Empty State (Initial view before submitting) -->
+      <section v-else class="section-block empty-section">
+        <EmptyState />
+      </section>
+    </div>
+  </main>
+
+  <!-- Project Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p class="footer-text">
+        AgriTrade • Smart Agricultural Decision Support System
+      </p>
+      <p class="footer-subtext">
+        Frontend Presentation UI Layer • Connected via Service Layer (Mock / FastAPI Ready)
+      </p>
+    </div>
+  </footer>
+</div>

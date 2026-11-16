@@ -1,0 +1,114 @@
+.summary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  min-height: 155px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-accent-glow {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(180deg, #ffffff 0%, var(--amber-50) 100%);
+}
+
+.card-profit-highlight {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(180deg, #ffffff 0%, var(--primary-50) 100%);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.icon-bubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.bubble-neutral {
+  background: var(--surface-muted);
+}
+
+.bubble-amber {
+  background: var(--amber-100);
+}
+
+.bubble-blue {
+  background: var(--blue-100);
+}
+
+.bubble-emerald {
+  background: var(--emerald-100);
+}
+
+.card-main-val {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.val-number {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.profit-number {
+  color: var(--primary-800);
+}
+
+.val-text {
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.val-unit {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+}
+
+.subtext {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}

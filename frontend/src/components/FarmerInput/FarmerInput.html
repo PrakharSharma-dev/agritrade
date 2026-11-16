@@ -1,0 +1,111 @@
+<div class="farmer-input-card glass-card">
+  <div class="card-header">
+    <div class="header-icon-circle">
+      <span>🚜</span>
+    </div>
+    <div>
+      <h2 class="card-title">Find the Best Time & Market to Sell</h2>
+      <p class="card-subtitle">Enter your harvest parameters to discover the most profitable selling strategy</p>
+    </div>
+  </div>
+
+  <form @submit.prevent="handleSubmit" class="input-form">
+    <div class="form-grid">
+      <!-- Crop Selection -->
+      <div class="form-group">
+        <label class="form-label" for="crop-select">
+          <span>🌾</span> Select Crop
+        </label>
+        <div class="select-wrapper">
+          <select
+            id="crop-select"
+            v-model="selectedCrop"
+            class="form-control"
+            required
+            :disabled="loading"
+          >
+            <option v-for="c in AVAILABLE_CROPS" :key="c.id" :value="c.id">
+              {{ c.icon }} {{ c.name }}
+            </option>
+          </select>
+          <span class="select-chevron">▼</span>
+        </div>
+      </div>
+
+      <!-- Location Selection -->
+      <div class="form-group">
+        <label class="form-label" for="location-select">
+          <span>📍</span> Your Location / Tehsil
+        </label>
+        <div class="select-wrapper">
+          <select
+            id="location-select"
+            v-model="selectedLocation"
+            class="form-control"
+            required
+            :disabled="loading"
+          >
+            <option v-for="loc in AVAILABLE_LOCATIONS" :key="loc" :value="loc">
+              {{ loc }}, Rajasthan
+            </option>
+          </select>
+          <span class="select-chevron">▼</span>
+        </div>
+      </div>
+
+      <!-- Quantity Input -->
+      <div class="form-group">
+        <label class="form-label" for="quantity-input">
+          <span>⚖️</span> Harvest Quantity
+        </label>
+        <div class="quantity-input-group">
+          <input
+            id="quantity-input"
+            v-model.number="quantity"
+            type="number"
+            min="10"
+            step="10"
+            placeholder="e.g. 1000"
+            class="form-control quantity-field"
+            required
+            :disabled="loading"
+          />
+          <div class="unit-toggle">
+            <button
+              type="button"
+              :class="['unit-btn', { active: unit === 'kg' }]"
+              @click="unit = 'kg'"
+            >
+              kg
+            </button>
+            <button
+              type="button"
+              :class="['unit-btn', { active: unit === 'quintal' }]"
+              @click="unit = 'quintal'"
+            >
+              Quintal
+            </button>
+          </div>
+        </div>
+        <div class="quantity-hint" v-if="unit === 'kg'">
+          ≈ <strong>{{ (quantity / 100).toFixed(1) }}</strong> Quintals (1 Quintal = 100 kg)
+        </div>
+        <div class="quantity-hint" v-else>
+          = <strong>{{ quantity * 100 }}</strong> kg
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Row -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn-primary submit-btn"
+        :disabled="loading || !quantity || quantity <= 0"
+      >
+        <span v-if="loading" class="spinner"></span>
+        <span>{{ loading ? 'Analyzing Market Conditions...' : 'Get Recommendation' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

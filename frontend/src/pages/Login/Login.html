@@ -1,0 +1,136 @@
+<div class="login-page-wrapper">
+  <!-- Subtle agricultural background decor -->
+  <div class="bg-shape-1"></div>
+  <div class="bg-shape-2"></div>
+
+  <div class="login-card-container">
+    <!-- Brand Header -->
+    <div class="login-brand-header">
+      <div class="brand-logo-badge">
+        <span class="logo-emoji">🌾</span>
+      </div>
+      <h1 class="login-brand-name">AgriTrade</h1>
+      <span class="badge badge-emerald">Farmer Portal</span>
+      <p class="login-brand-desc">Smart Crop Selling & Market Price Optimization</p>
+    </div>
+
+    <!-- Step 1: Email Only Input Form -->
+    <div class="login-card glass-card">
+      <div class="login-card-top">
+        <h2 class="card-title">Instant Farmer Login</h2>
+        <p class="card-subtitle">Enter your registered email address to receive a one-time password (OTP)</p>
+      </div>
+
+      <form @submit.prevent="handleSendOtp" class="email-form">
+        <!-- Email input ONLY -->
+        <div class="form-group">
+          <label class="form-label" for="farmer-email">
+            <span>✉️</span> Farmer Email Address
+          </label>
+          <input
+            id="farmer-email"
+            v-model.trim="email"
+            type="email"
+            placeholder="e.g. ramkishan.farmer@gmail.com"
+            class="form-control email-input"
+            required
+            :disabled="loading"
+            autocomplete="email"
+          />
+        </div>
+
+        <div v-if="errorMessage" class="error-msg">
+          <span>⚠️</span> {{ errorMessage }}
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary login-btn"
+          :disabled="loading || !email"
+        >
+          <span v-if="loading" class="spinner"></span>
+          <span v-else>Get OTP Verification Code</span>
+        </button>
+      </form>
+
+      <div class="login-security-notice">
+        <span>🔒</span>
+        <span>Secure passwordless JWT authentication for Indian farmers</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: OTP Verification Modal / Overlay -->
+  <div v-if="showOtpOverlay" class="otp-modal-backdrop">
+    <div class="otp-modal-card glass-card">
+      <button class="btn-close-modal" @click="closeOtpModal" title="Cancel">✕</button>
+
+      <div class="otp-header">
+        <div class="otp-icon-circle">
+          <span>🔐</span>
+        </div>
+        <h3 class="otp-modal-title">Enter Verification Code</h3>
+        <p class="otp-modal-sub">
+          We have generated a secure one-time passcode for:
+          <br><strong>{{ email }}</strong>
+        </p>
+      </div>
+
+      <!-- Prominently displayed OTP inside the login overlay -->
+      <div class="demo-otp-banner">
+        <div class="otp-banner-label">
+          <span class="pulse-dot"></span>
+          <span>DEMO OTP CODE</span>
+        </div>
+        <div class="otp-display-box">
+          <span class="otp-code-digits">{{ currentOtp }}</span>
+          <button type="button" class="btn-copy-otp" @click="autoFillOtp" title="Click to auto-fill">
+            Quick Fill
+          </button>
+        </div>
+      </div>
+
+      <!-- OTP Input Form -->
+      <form @submit.prevent="handleVerifyOtp" class="otp-form">
+        <div class="form-group">
+          <label class="form-label" for="otp-input">
+            <span>🔢</span> 6-Digit OTP
+          </label>
+          <input
+            id="otp-input"
+            v-model.trim="enteredOtp"
+            type="text"
+            maxlength="6"
+            placeholder="• • • • • •"
+            class="form-control otp-input-field"
+            required
+            :disabled="verifying"
+            autofocus
+          />
+        </div>
+
+        <div v-if="otpError" class="error-msg">
+          <span>⚠️</span> {{ otpError }}
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary verify-btn"
+          :disabled="verifying || !enteredOtp || enteredOtp.length < 4"
+        >
+          <span v-if="verifying" class="spinner"></span>
+          <span v-else>Verify & Enter Dashboard</span>
+        </button>
+      </form>
+
+      <div class="otp-footer-actions">
+        <button type="button" class="btn-link" @click="resendOtp" :disabled="loading">
+          Resend Code
+        </button>
+        <button type="button" class="btn-link" @click="closeOtpModal">
+          Change Email
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

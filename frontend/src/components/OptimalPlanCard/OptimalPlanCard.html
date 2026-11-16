@@ -1,0 +1,94 @@
+<div class="optimal-plan-card glass-card">
+  <div class="banner-tag">
+    <span class="star-icon">⭐</span>
+    <span>OPTIMAL SELLING PLAN</span>
+  </div>
+
+  <div class="plan-content">
+    <!-- Left / Top Primary Highlight -->
+    <div class="plan-header-row">
+      <div>
+        <span class="recommendation-badge">System Recommendation</span>
+        <h2 class="target-headline">
+          Sell {{ crop }} at <span class="highlight-market">{{ recommendation.market }}</span>
+        </h2>
+        <p class="plan-explanation">
+          {{ recommendation.reasoning || `Based on the predicted prices and estimated costs, AgriTrade recommends selling at ${recommendation.market} on ${recommendation.date}.` }}
+        </p>
+      </div>
+
+      <div class="net-profit-badge-container">
+        <div class="profit-pill">
+          <span class="profit-label">💵 Expected Net Profit</span>
+          <span class="profit-amount">{{ formatINR(recommendation.expected_profit) }}</span>
+          <span class="profit-note">Estimated Net Return</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Parameters Grid -->
+    <div class="parameters-grid">
+      <!-- Recommended Market -->
+      <div class="param-box">
+        <div class="param-icon">⭐</div>
+        <div class="param-details">
+          <span class="param-title">Recommended Market</span>
+          <span class="param-value">{{ recommendation.market }}</span>
+        </div>
+      </div>
+
+      <!-- Recommended Selling Date -->
+      <div class="param-box">
+        <div class="param-icon">📅</div>
+        <div class="param-details">
+          <span class="param-title">Recommended Selling Date</span>
+          <span class="param-value">{{ recommendation.date }}</span>
+        </div>
+      </div>
+
+      <!-- Expected Price -->
+      <div class="param-box">
+        <div class="param-icon">💰</div>
+        <div class="param-details">
+          <span class="param-title">Predicted Selling Price</span>
+          <span class="param-value">{{ formatINR(recommendation.predicted_price) }} <small>/ quintal</small></span>
+        </div>
+      </div>
+
+      <!-- Transportation Cost -->
+      <div class="param-box">
+        <div class="param-icon">🚚</div>
+        <div class="param-details">
+          <span class="param-title">Estimated Transport Cost</span>
+          <span class="param-value">{{ formatINR(recommendation.transport_cost) }}</span>
+        </div>
+      </div>
+
+      <!-- Storage Cost -->
+      <div class="param-box">
+        <div class="param-icon">🏠</div>
+        <div class="param-details">
+          <span class="param-title">Estimated Storage Cost</span>
+          <span class="param-value">{{ formatINR(recommendation.storage_cost) }}</span>
+        </div>
+      </div>
+
+      <!-- Total Logistics Deduction -->
+      <div class="param-box">
+        <div class="param-icon">📊</div>
+        <div class="param-details">
+          <span class="param-title">Estimated Total Cost</span>
+          <span class="param-value">{{ formatINR((recommendation.transport_cost || 0) + (recommendation.storage_cost || 0)) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disclaimer Banner with Safe Language -->
+    <div class="advisory-notice">
+      <span class="notice-icon">ℹ️</span>
+      <span class="notice-text">
+        <strong>Advisory Note:</strong> Projections are based on mathematical models and historical market data trends. All values are <em>predicted</em> and <em>estimated</em> recommendations to support informed farmer decision-making.
+      </span>
+    </div>
+  </div>
+</div>
