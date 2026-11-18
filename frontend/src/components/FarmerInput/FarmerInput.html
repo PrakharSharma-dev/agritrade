@@ -4,8 +4,8 @@
       <span>🚜</span>
     </div>
     <div>
-      <h2 class="card-title">Find the Best Time & Market to Sell</h2>
-      <p class="card-subtitle">Enter your harvest parameters to discover the most profitable selling strategy</p>
+      <h2 class="card-title">{{ t('formTitle') }}</h2>
+      <p class="card-subtitle">{{ t('formSubtitle') }}</p>
     </div>
   </div>
 
@@ -14,7 +14,7 @@
       <!-- Crop Selection -->
       <div class="form-group">
         <label class="form-label" for="crop-select">
-          <span>🌾</span> Select Crop
+          <span aria-hidden="true">🌾</span> {{ t('selectCrop') }}
         </label>
         <div class="select-wrapper">
           <select
@@ -28,14 +28,14 @@
               {{ c.icon }} {{ c.name }}
             </option>
           </select>
-          <span class="select-chevron">▼</span>
+          <span class="select-chevron" aria-hidden="true">▼</span>
         </div>
       </div>
 
       <!-- Location Selection -->
       <div class="form-group">
         <label class="form-label" for="location-select">
-          <span>📍</span> Your Location / Tehsil
+          <span aria-hidden="true">📍</span> {{ t('location') }}
         </label>
         <div class="select-wrapper">
           <select
@@ -49,14 +49,14 @@
               {{ loc }}, Rajasthan
             </option>
           </select>
-          <span class="select-chevron">▼</span>
+          <span class="select-chevron" aria-hidden="true">▼</span>
         </div>
       </div>
 
       <!-- Quantity Input -->
       <div class="form-group">
         <label class="form-label" for="quantity-input">
-          <span>⚖️</span> Harvest Quantity
+          <span aria-hidden="true">⚖️</span> {{ t('quantity') }}
         </label>
         <div class="quantity-input-group">
           <input
@@ -75,6 +75,7 @@
               type="button"
               :class="['unit-btn', { active: unit === 'kg' }]"
               @click="unit = 'kg'"
+              :aria-pressed="unit === 'kg'"
             >
               kg
             </button>
@@ -82,10 +83,12 @@
               type="button"
               :class="['unit-btn', { active: unit === 'quintal' }]"
               @click="unit = 'quintal'"
+              :aria-pressed="unit === 'quintal'"
             >
               Quintal
             </button>
           </div>
+
         </div>
         <div class="quantity-hint" v-if="unit === 'kg'">
           ≈ <strong>{{ (quantity / 100).toFixed(1) }}</strong> Quintals (1 Quintal = 100 kg)
@@ -94,6 +97,86 @@
           = <strong>{{ quantity * 100 }}</strong> kg
         </div>
       </div>
+
+      <fieldset class="form-group storage-group">
+        <legend class="form-label"><span aria-hidden="true">🏠</span> {{ t('storage') }}</legend>
+        <div class="storage-options" role="radiogroup" :aria-label="t('storage')">
+          <label class="storage-option">
+            <input v-model="hasStorage" type="radio" name="has-storage" :value="true" required :disabled="loading" />
+            <span>{{ t('yes') }}</span>
+          </label>
+          <label class="storage-option">
+            <input v-model="hasStorage" type="radio" name="has-storage" :value="false" required :disabled="loading" />
+            <span>{{ t('no') }}</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="form-group">
+        <label class="form-label" for="transportation-cost">
+          <span aria-hidden="true">🚚</span> {{ t('transportCost') }} (₹)
+        </label>
+        <input
+          id="transportation-cost"
+          v-model.number="transportationCost"
+          type="number"
+          min="0"
+          step="1"
+          class="form-control"
+          placeholder="0"
+          required
+          :disabled="loading"
+        />
+      </div>
+
+      <div v-if="hasStorage === true" class="form-group">
+        <label class="form-label" for="storage-cost">
+          <span aria-hidden="true">🏠</span> {{ t('storageCost') }} (₹)
+        </label>
+        <input
+          id="storage-cost"
+          v-model.number="storageCost"
+          type="number"
+          min="0"
+          step="1"
+          class="form-control"
+          placeholder="0"
+          required
+          :disabled="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="additional-expense-name">
+          <span aria-hidden="true">📝</span> {{ t('additionalExpenseName') }}
+        </label>
+        <input
+          id="additional-expense-name"
+          v-model="additionalExpenseName"
+          type="text"
+          class="form-control"
+          :placeholder="t('additionalExpenseNamePlaceholder')"
+          required
+          :disabled="loading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="additional-expense-cost">
+          <span aria-hidden="true">🧾</span> {{ t('additionalExpense') }} (₹)
+        </label>
+        <input
+          id="additional-expense-cost"
+          v-model.number="additionalExpenseCost"
+          type="number"
+          min="0"
+          step="1"
+          class="form-control"
+          placeholder="0"
+          required
+          :disabled="loading"
+        />
+      </div>
     </div>
 
     <!-- Action Row -->
@@ -101,10 +184,10 @@
       <button
         type="submit"
         class="btn-primary submit-btn"
-        :disabled="loading || !quantity || quantity <= 0"
+        :disabled="loading || !quantity || quantity <= 0 || hasStorage === null || transportationCost === null || transportationCost < 0 || !additionalExpenseName.trim() || additionalExpenseCost === null || additionalExpenseCost < 0 || (hasStorage === true && (storageCost === null || storageCost < 0))"
       >
         <span v-if="loading" class="spinner"></span>
-        <span>{{ loading ? 'Analyzing Market Conditions...' : 'Get Recommendation' }}</span>
+        <span>{{ loading ? t('analyzing') : t('recommendation') }}</span>
       </button>
     </div>
   </form>

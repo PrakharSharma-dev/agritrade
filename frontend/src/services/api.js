@@ -166,3 +166,34 @@ export async function getPrediction(cropId, marketId) {
 
   return await response.json();
 }
+
+// Chatbot API integration
+export async function sendChatMessage(payload) {
+  const response = await fetch(`${API_BASE_URL}/api/chat/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: payload.message,
+      language: payload.language,
+      context: payload.context
+    })
+  });
+
+  if (!response.ok) {
+    let message = `Chatbot API error: ${response.status}`;
+
+    try {
+      const errorData = await response.json();
+      message = errorData.detail || message;
+    } catch {
+      // Keep default error message
+    }
+
+    throw new Error(message);
+  }
+
+  return await response.json();
+}
+

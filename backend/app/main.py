@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.routers import crops, markets, prices, predictions
+from backend.app.routers import crops, markets, prices, predictions, chat
 
 app = FastAPI(
     title="AgriTrade API",
@@ -10,7 +10,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow requests from the Vue + Vite frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -22,11 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Existing API routers
 app.include_router(crops.router)
 app.include_router(markets.router)
 app.include_router(prices.router)
 app.include_router(predictions.router)
+app.include_router(chat.router)
 
 
 @app.get("/")

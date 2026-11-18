@@ -1,8 +1,10 @@
+
 <div class="agritrade-dashboard-page">
   <Header :user-email="userEmail" @logout="handleLogout" />
 
   <main class="dashboard-main">
     <div class="content-container">
+
       <!-- 1. Farmer Input Section -->
       <section class="section-block input-section">
         <FarmerInput
@@ -14,106 +16,154 @@
       <!-- 2. Loading State -->
       <section v-if="loading" class="section-block">
         <LoadingState
-          message="Analyzing market conditions..."
-          subtext="Simulating real-time mandi feeds, forecasting 7-day crop price trajectories, and determining logistics & holding costs..."
+          :message="t('loadingMessage')"
+          :subtext="t('loadingSubtext')"
         />
       </section>
 
       <!-- 3. Error State -->
       <section v-else-if="error" class="section-block">
-        <div class="error-banner glass-card">
+        <div
+          class="error-banner glass-card"
+          role="alert"
+          aria-live="assertive"
+        >
           <div class="error-icon">⚠️</div>
           <div class="error-content">
-            <h4 class="error-title">Recommendation Failed</h4>
+            <h4 class="error-title">
+              {{ t('recommendationFailed') }}
+            </h4>
             <p class="error-text">{{ error }}</p>
           </div>
           <button class="btn-retry" @click="handleRetry">
-            🔄 Try Again
+            🔄 {{ t('tryAgain') }}
           </button>
         </div>
       </section>
 
-      <!-- 4. Dashboard Results View (Shown only after recommendation is received) -->
-      <section v-else-if="resultData" class="section-block results-section">
-        <!-- Action Bar with Quick Controls -->
+      <!-- 4. Dashboard Results -->
+      <section
+        v-else-if="resultData"
+        class="section-block results-section"
+      >
+
+        <!-- Action Bar -->
         <div class="results-header-bar">
           <div class="results-summary-pill">
             <span class="pill-dot"></span>
-            <span>Showing optimal selling plan for <strong>{{ resultData.crop }}</strong> from <strong>{{ resultData.farmer_location }}</strong> ({{ resultData.quantity }} kg)</span>
+            <span>
+              {{ t('showingPlan', {
+                crop: resultData.crop,
+                location: resultData.farmer_location,
+                quantity: resultData.quantity,
+                storage: resultData.has_storage ? t('yes') : t('no')
+              }) }}
+            </span>
           </div>
-          <button class="btn-reset" @click="handleReset" title="Clear results and start new inquiry">
-            ✕ Clear Results
+
+          <button
+            class="btn-reset"
+            @click="handleReset"
+            :title="t('clearResults')"
+            :aria-label="t('clearResults')"
+          >
+            ✕ {{ t('clearResults') }}
           </button>
         </div>
 
-        <!-- A. 4 Key Metric Summary Cards -->
+        <!-- A. Summary Cards -->
         <SummaryCards
-         :current-price="predictionData
-           ? Number(predictionData.latest_modal_price)
-           : Number(resultData.current_price)"
-         :recommended-market="resultData.recommendation.market"
-         :recommended-date="resultData.recommendation.date"
-         :expected-profit="resultData.recommendation.expected_profit"
-        :predicted-price="predictionData
-           ? Number(predictionData.predicted_price)
-             : 0"
+          :current-price="predictionData
+            ? Number(predictionData.latest_modal_price)
+            : Number(resultData.current_price)"
+          :recommended-market="resultData.recommendation.market"
+          :recommended-date="resultData.recommendation.date"
+          :expected-profit="resultData.recommendation.expected_profit"
+          :predicted-price="predictionData
+            ? Number(predictionData.predicted_price)
+            : Number(resultData.recommendation.predicted_price || 0)"
+          :has-storage="resultData.has_storage"
         />
 
-<div v-if="predictionData" class="results-summary-pill" style="margin-top: 12px;">
-  <span class="pill-dot"></span>
-  Real ML prediction received from FastAPI.
-  Latest observation: {{ predictionData.latest_observation_date }}
-  · Model: {{ predictionData.model }}
-</div>
+        <!-- Real ML Prediction Status -->
+        <div
+          v-if="predictionData"
+          class="results-summary-pill"
+          style="margin-top: 12px;"
+        >
+          <span class="pill-dot"></span>
+          Real ML prediction received from FastAPI.
+          Latest observation:
+          {{ predictionData.latest_observation_date }}
+          · Model: {{ predictionData.model }}
+        </div>
 
-<div v-else-if="predictionError" class="error-text" style="margin-top: 12px;">
-  ML prediction unavailable: {{ predictionError }}
-</div>
+        <div
+          v-else-if="predictionError"
+          class="error-text"
+          style="margin-top: 12px;"
+        >
+          ML prediction unavailable: {{ predictionError }}
+        </div>
 
-
-
-        <!-- B. Prominent Optimal Selling Plan Card -->
+        <!-- B. Optimal Selling Plan -->
         <OptimalPlanCard
           :recommendation="resultData.recommendation"
           :crop="resultData.crop"
           :quantity="resultData.quantity"
+          :has-storage="resultData.has_storage"
+          :additional-expense-cost="resultData.recommendation.additional_expense_cost || resultData.additional_expense_cost"
+          :additional-expense-name="resultData.recommendation.additional_expense_name || resultData.additional_expense_name"
         />
 
-        <!-- C. 7-Day Forecast Line Chart -->
+        <!-- C. 7-Day Forecast -->
         <ForecastChart
           :forecast-data="resultData.forecast"
           :recommended-date="resultData.recommendation.date"
         />
 
-        <!-- D. Two Column Grid: Market Comparison & Logistics Breakdown -->
+        <!-- D. Market Comparison and Cost Analysis -->
         <div class="results-two-col-grid">
+
           <MarketComparison
             :markets="resultData.markets"
             :recommended-market-name="resultData.recommendation.market"
           />
+
           <CostAnalysis
             :transport-cost="resultData.recommendation.transport_cost"
             :storage-cost="resultData.recommendation.storage_cost"
             :total-cost="resultData.recommendation.total_cost"
+            :has-storage="resultData.has_storage"
+            :additional-expense-cost="resultData.recommendation.additional_expense_cost || resultData.additional_expense_cost"
+            :additional-expense-name="resultData.recommendation.additional_expense_name || resultData.additional_expense_name"
           />
+
         </div>
       </section>
 
-      <!-- 5. Empty State (Initial view before submitting) -->
-      <section v-else class="section-block empty-section">
+      <!-- 5. Empty State -->
+      <section
+        v-else
+        class="section-block empty-section"
+      >
         <EmptyState />
       </section>
+
     </div>
   </main>
+
+  <!-- Chatbot -->
+  <ChatBot :recommendation-context="chatContext" />
 
   <!-- Project Footer -->
   <footer class="app-footer">
     <div class="footer-container">
       <p class="footer-text">
-        AgriTrade • Smart Agricultural Decision Support System
+        {{ t('footer') }}
       </p>
       <p class="footer-subtext">
-        Frontend Presentation UI Layer • Connected via Service Layer (Mock / FastAPI Ready)
+        {{ t('footerSubtext') }}
       </p>
     </div>
   </footer>

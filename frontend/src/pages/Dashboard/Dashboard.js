@@ -1,5 +1,4 @@
-
-import { ref } from 'vue';
+import { ref, computed, inject } from 'vue';
 
 import Header from '../../components/Header/Header.vue';
 import FarmerInput from '../../components/FarmerInput/FarmerInput.vue';
@@ -10,6 +9,7 @@ import MarketComparison from '../../components/MarketComparison/MarketComparison
 import CostAnalysis from '../../components/CostAnalysis/CostAnalysis.vue';
 import LoadingState from '../../components/LoadingState/LoadingState.vue';
 import EmptyState from '../../components/EmptyState/EmptyState.vue';
+import ChatBot from '../../components/ChatBot/ChatBot.vue';
 
 import {
   getRecommendation,
@@ -28,7 +28,8 @@ export default {
     MarketComparison,
     CostAnalysis,
     LoadingState,
-    EmptyState
+    EmptyState,
+    ChatBot
   },
 
   props: {
@@ -41,6 +42,8 @@ export default {
   emits: ['logout'],
 
   setup(props, { emit }) {
+    const { t } = inject('i18n');
+
     const loading = ref(false);
     const error = ref(null);
     const predictionError = ref(null);
@@ -49,7 +52,13 @@ export default {
     const predictionData = ref(null);
     const lastQueryParams = ref(null);
 
-    // Initially support only the verified database combination.
+    // Chatbot context
+    const chatContext = computed(() => ({
+      resultData: resultData.value,
+      queryParams: lastQueryParams.value
+    }));
+
+    // Verified database IDs
     const cropIdMap = {
       Wheat: 1
     };
@@ -65,14 +74,13 @@ export default {
 
       resultData.value = null;
       predictionData.value = null;
-
       lastQueryParams.value = queryParams;
 
       try {
-        // Preserve existing recommendation functionality.
+        // Existing recommendation functionality
         const recommendationPromise = getRecommendation(queryParams);
 
-        // Resolve verified database IDs.
+        // ML prediction functionality
         const cropId = cropIdMap[queryParams.crop];
         const marketId = marketIdMap[queryParams.location];
 
@@ -88,7 +96,7 @@ export default {
           );
         }
 
-        // Run both requests independently.
+        // Run both requests independently
         const [recommendationResult, predictionResult] =
           await Promise.allSettled([
             recommendationPromise,
@@ -105,12 +113,16 @@ export default {
           predictionData.value = predictionResult.value;
         } else {
           console.error('Prediction API Error:', predictionResult.reason);
-          predictionError.value = predictionResult.reason.message;
+
+          predictionError.value =
+            predictionResult.reason?.message ||
+            'Prediction service unavailable.';
         }
 
       } catch (err) {
         console.error('Dashboard Error:', err);
-        error.value = 'Unable to generate recommendation. Please try again.';
+        error.value = t('error');
+
       } finally {
         loading.value = false;
       }
@@ -143,7 +155,9 @@ export default {
       handleFarmerSubmit,
       handleRetry,
       handleReset,
-      handleLogout
+      handleLogout,
+      chatContext,
+      t
     };
   }
 };

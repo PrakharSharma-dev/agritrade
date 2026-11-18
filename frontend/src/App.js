@@ -1,7 +1,8 @@
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
 import Dashboard from './pages/Dashboard/Dashboard.vue';
 import Login from './pages/Login/Login.vue';
 import { getStoredAuth, logoutUser } from './services/api';
+import { useI18n } from './i18n';
 
 export default {
   name: 'App',
@@ -10,6 +11,8 @@ export default {
     Login
   },
   setup() {
+    const i18n = useI18n();
+    provide('i18n', i18n);
     const isAuthenticated = ref(false);
     const currentUserEmail = ref('');
 

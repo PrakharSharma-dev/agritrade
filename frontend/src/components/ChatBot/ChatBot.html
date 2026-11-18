@@ -1,0 +1,78 @@
+<div class="chatbot-root">
+  <section
+    v-if="isOpen"
+    class="chatbot-panel"
+    role="dialog"
+    aria-modal="false"
+    :aria-label="title"
+  >
+    <header class="chatbot-header">
+      <div class="chatbot-title">
+        <span class="chatbot-avatar" aria-hidden="true">🌾</span>
+        <div>
+          <strong>{{ title }}</strong>
+          <span>{{ locale === 'hi' ? 'कृषि सहायता उपलब्ध' : 'Agriculture assistant online' }}</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="chatbot-close"
+        :aria-label="locale === 'hi' ? 'चैट बंद करें' : 'Close chat'"
+        @click="closeChat"
+      >
+        ×
+      </button>
+    </header>
+
+    <div
+      ref="messagesContainer"
+      class="chatbot-messages"
+      role="log"
+      aria-live="polite"
+      aria-relevant="additions"
+    >
+      <div
+        v-for="(message, index) in messages"
+        :key="index"
+        :class="['chatbot-message', message.role]"
+      >
+        {{ message.text }}
+      </div>
+      <div v-if="isSending" class="chatbot-message assistant typing" aria-label="Assistant is typing">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <form class="chatbot-compose" @submit.prevent="sendMessage">
+      <label class="sr-only" for="chatbot-input">
+        {{ locale === 'hi' ? 'सहायक को संदेश' : 'Message the assistant' }}
+      </label>
+      <input
+        id="chatbot-input"
+        v-model="draft"
+        type="text"
+        autocomplete="off"
+        :placeholder="locale === 'hi' ? 'अपना प्रश्न लिखें...' : 'Ask about your recommendation...'"
+        :disabled="isSending"
+      />
+      <button
+        type="submit"
+        :aria-label="locale === 'hi' ? 'संदेश भेजें' : 'Send message'"
+        :disabled="!draft.trim() || isSending"
+      >
+        ➤
+      </button>
+    </form>
+  </section>
+
+  <button
+    type="button"
+    class="chatbot-launcher"
+    :aria-label="isOpen ? (locale === 'hi' ? 'चैट बंद करें' : 'Close chat') : (locale === 'hi' ? 'एग्रीट्रेड सहायक खोलें' : 'Open AgriTrade assistant')"
+    :aria-expanded="isOpen"
+    @click="toggleChat"
+  >
+    <span v-if="isOpen" aria-hidden="true">×</span>
+    <span v-else aria-hidden="true">💬</span>
+  </button>
+</div>
